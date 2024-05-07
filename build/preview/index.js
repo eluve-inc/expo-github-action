@@ -41872,7 +41872,7 @@ async function previewAction(input = previewInput()) {
     // Create the update before loading project information.
     // When the project needs to be set up, EAS project ID won't be available before this command.
     const command = sanitizeCommand(input.command);
-    const updates = await (0, core_1.group)(`Run eas ${command}"`, () => (0, eas_1.createUpdate)(input.workingDirectory, command));
+    const updates = await (0, core_1.group)(`Running: ${command}"`, () => (0, eas_1.createUpdate)(input.workingDirectory, command));
     const update = updates.find(update => !!update);
     if (!update) {
         return (0, core_1.setFailed)(`No update found in command output.`);
@@ -42132,7 +42132,7 @@ exports.assertEasVersion = assertEasVersion;
 async function createUpdate(cwd, command) {
     let stdout = '';
     try {
-        ({ stdout } = await (0, exec_1.getExecOutput)((await (0, io_1.which)('eas', true)) + ` ${command}`, undefined, {
+        ({ stdout } = await (0, exec_1.getExecOutput)(command, undefined, {
             cwd,
         }));
     }
