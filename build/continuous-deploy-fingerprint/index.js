@@ -41924,13 +41924,32 @@ exports.assertEasVersion = assertEasVersion;
 async function createUpdate(cwd, command) {
     let stdout = '';
     try {
-        ({ stdout } = await (0, exec_1.getExecOutput)((await (0, io_1.which)('eas', true)) + ` ${command}`, undefined, {
+        ({ stdout } = await (0, exec_1.getExecOutput)(command, undefined, {
             cwd,
         }));
     }
     catch (error) {
         throw new Error(`Could not create a new EAS Update`, { cause: error });
     }
+
+
+  // try {
+  //   // Execute the passed in command directly
+  //   ({ stdout } = await getExecOutput(command, undefined, {
+  //     cwd,
+  //   }));
+  // } catch (error: unknown) {
+  //   throw new Error(`Failed to execute command: "${command}"`, { cause: error });
+  // }
+
+  try {
+    // Execute the passed in command directly
+    ({ stdout } = await getExecOutput(command, undefined, {
+      cwd,
+    }));
+  } catch (error: unknown) {
+    throw new Error(`Failed to execute command: "${command}"`, { cause: error });
+  }
     return JSON.parse(stdout);
 }
 exports.createUpdate = createUpdate;
