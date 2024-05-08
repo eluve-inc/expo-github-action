@@ -41857,6 +41857,7 @@ function previewInput() {
         shouldComment: !(0, core_1.getInput)('comment') || (0, core_1.getBooleanInput)('comment'),
         commentId: (0, core_1.getInput)('comment-id') || exports.MESSAGE_ID,
         workingDirectory: (0, core_1.getInput)('working-directory'),
+        projectRoot: (0, core_1.getInput)('project-root'),
         githubToken: (0, core_1.getInput)('github-token'),
         // Note, `dev-build` is prefered, but `dev-client` is supported to aovid confusion
         qrTarget: qrTarget,
@@ -41877,7 +41878,7 @@ async function previewAction(input = previewInput()) {
     if (!update) {
         return (0, core_1.setFailed)(`No update found in command output.`);
     }
-    const config = await (0, project_1.loadProjectConfig)(input.workingDirectory);
+    const config = await (0, project_1.loadProjectConfig)(input.projectRoot);
     if (!config.extra?.eas?.projectId) {
         return (0, core_1.setFailed)(`Missing 'extra.eas.projectId' in app.json or app.config.js.`);
     }
