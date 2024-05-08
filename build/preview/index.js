@@ -41872,7 +41872,7 @@ async function previewAction(input = previewInput()) {
     // Create the update before loading project information.
     // When the project needs to be set up, EAS project ID won't be available before this command.
     const command = sanitizeCommand(input.command);
-    const updates = await (0, core_1.group)(`Running: ${command}"`, () => (0, eas_1.createUpdate)(input.workingDirectory, command));
+    const updates = await (0, core_1.group)(`Runing command: ${command}"`, () => (0, eas_1.createUpdate)(input.workingDirectory, command));
     const update = updates.find(update => !!update);
     if (!update) {
         return (0, core_1.setFailed)(`No update found in command output.`);
@@ -41912,11 +41912,11 @@ exports.previewAction = previewAction;
  */
 function sanitizeCommand(input) {
     let command = input.trim();
+    // disabling this so we can use this with NX commands
     // if (!command.startsWith('eas')) {
-    //     throw new Error(`The command must start with "eas", received "${command}"`);
-    // }
-    // else {
-    //     command = command.replace(/^eas/, '').trim();
+    //   throw new Error(`The command must start with "eas", received "${command}"`);
+    // } else {
+    //   command = command.replace(/^eas/, '').trim();
     // }
     if (!command.includes('--json')) {
         command += ' --json';
@@ -42139,7 +42139,14 @@ async function createUpdate(cwd, command) {
     catch (error) {
         throw new Error(`Could not create a new EAS Update`, { cause: error });
     }
-    return JSON.parse(stdout);
+    // Attempt to find the JSON segment in the stdout
+    const matches = stdout.match(/(\[\s*{\s*[^[\]]*}\s*\])/);
+    if (matches && matches[0]) {
+        return JSON.parse(matches[0]);
+    }
+    else {
+        throw new Error('No JSON output found in command response.');
+    }
 }
 exports.createUpdate = createUpdate;
 /**

@@ -38,7 +38,7 @@ export async function previewAction(input = previewInput()) {
   // Create the update before loading project information.
   // When the project needs to be set up, EAS project ID won't be available before this command.
   const command = sanitizeCommand(input.command);
-  const updates = await group(`Run eas ${command}"`, () => createUpdate(input.workingDirectory, command));
+  const updates = await group(`Runing command: ${command}"`, () => createUpdate(input.workingDirectory, command));
 
   const update = updates.find(update => !!update);
   if (!update) {

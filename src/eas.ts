@@ -55,14 +55,21 @@ export async function createUpdate(cwd: string, command: string): Promise<EasUpd
   let stdout = '';
 
   try {
-    ({ stdout } = await getExecOutput((await which('eas', true)) + ` ${command}`, undefined, {
+    ({ stdout } = await getExecOutput(command, undefined, {
       cwd,
     }));
   } catch (error: unknown) {
     throw new Error(`Could not create a new EAS Update`, { cause: error });
   }
 
-  return JSON.parse(stdout);
+  // Attempt to find the JSON segment in the stdout
+  const matches = stdout.match(/(\[\s*{\s*[^[\]]*}\s*\])/);
+
+  if (matches && matches[0]) {
+    return JSON.parse(matches[0]);
+  } else {
+    throw new Error('No JSON output found in command response.');
+  }
 }
 
 /**
