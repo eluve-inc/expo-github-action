@@ -62,13 +62,27 @@ export async function createUpdate(cwd: string, command: string): Promise<EasUpd
     throw new Error(`Could not create a new EAS Update`, { cause: error });
   }
 
-  // Attempt to find the JSON segment in the stdout
-  const matches = stdout.match(/(\[.*\])/s);
+  // // Attempt to find the JSON segment in the stdout
+  const regex = /(\[.*\]|\{.*\})/s;
+  const match = stdout.match(regex);
 
-  if (matches && matches[0]) {
-    return JSON.parse(matches[0]);
-  } else {
+  if (!match) {
     throw new Error('No JSON output found in command response.');
+  }
+
+  // Replace unescaped special characters
+  let jsonString = match[0];
+  jsonString = jsonString
+    .replace(/\n/g, '') // Escapes unescaped newlines
+    .replace(/\r/g, '') // Escapes unescaped carriage returns
+    .replace(/\t/g, ''); // Escapes unescaped tabs
+
+  try {
+    const json = JSON.parse(jsonString);
+    return json;
+  } catch (error) {
+    console.error('Failed to parse JSON', error);
+    throw error;
   }
 }
 
