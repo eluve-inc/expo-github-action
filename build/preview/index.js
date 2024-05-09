@@ -42141,7 +42141,7 @@ async function createUpdate(cwd, command) {
         throw new Error(`Could not create a new EAS Update`, { cause: error });
     }
     // Attempt to find the JSON segment in the stdout
-    const matches = stdout.match(/(\[\s*{\s*[^[\]]*}\s*\])/);
+    const matches = stdout.match(/(\[.*\])/s);
     if (matches && matches[0]) {
         return JSON.parse(matches[0]);
     }

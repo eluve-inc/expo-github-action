@@ -63,7 +63,7 @@ export async function createUpdate(cwd: string, command: string): Promise<EasUpd
   }
 
   // Attempt to find the JSON segment in the stdout
-  const matches = stdout.match(/(\[\s*{\s*[^[\]]*}\s*\])/);
+  const matches = stdout.match(/(\[.*\])/s);
 
   if (matches && matches[0]) {
     return JSON.parse(matches[0]);
