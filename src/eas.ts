@@ -62,20 +62,24 @@ export async function createUpdate(cwd: string, command: string): Promise<EasUpd
     throw new Error(`Could not create a new EAS Update`, { cause: error });
   }
 
-  // // Attempt to find the JSON segment in the stdout
-  const regex = /(\[.*\]|\{.*\})/s;
-  const match = stdout.match(regex);
-
-  if (!match) {
-    throw new Error('No JSON output found in command response.');
+  // Find the start index right after the '✔ Published!' marker
+  const startIndex = stdout.indexOf('✔ Published!');
+  if (startIndex === -1) {
+    throw new Error('Starting marker ✔ Published! not found.');
   }
-
-  // Replace unescaped special characters
-  let jsonString = match[0];
-  jsonString = jsonString
+  // Extract everything after '✔ Published!'
+  const jsonString = stdout
+    .substring(startIndex + '✔ Published!'.length)
     .replace(/\n/g, '') // Escapes unescaped newlines
     .replace(/\r/g, '') // Escapes unescaped carriage returns
-    .replace(/\t/g, ''); // Escapes unescaped tabs
+    .replace(/\t/g, '') // Escapes unescaped tabs
+    .trim();
+  // Assume the JSON starts with a '[' or '{' and ends correspondingly
+  const regex = /^\[\s*{.*}\s*\]$|^\{\s*.*\s*\}$/ms;
+  const match = jsonString.match(regex);
+  if (!match) {
+    throw new Error('No properly formatted JSON string found after the marker');
+  }
 
   try {
     const json = JSON.parse(jsonString);
