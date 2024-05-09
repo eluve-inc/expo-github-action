@@ -41838,7 +41838,7 @@ try {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createSummary = exports.getVariables = exports.previewAction = exports.previewInput = exports.MESSAGE_ID = void 0;
+exports.createSummary = exports.getVariables = exports.previewAction = exports.previewInput = exports.MESSAGE_ID = exports.parseEasUpdateOutput = void 0;
 const core_1 = __nccwpck_require__(2186);
 const comment_1 = __nccwpck_require__(7810);
 const eas_1 = __nccwpck_require__(3251);
@@ -41846,6 +41846,8 @@ const github_1 = __nccwpck_require__(978);
 const project_1 = __nccwpck_require__(7191);
 const utils_1 = __nccwpck_require__(1314);
 const worker_1 = __nccwpck_require__(8912);
+var eas_2 = __nccwpck_require__(3251);
+Object.defineProperty(exports, "parseEasUpdateOutput", ({ enumerable: true, get: function () { return eas_2.parseEasUpdateOutput; } }));
 exports.MESSAGE_ID = 'projectId:{projectId}';
 function previewInput() {
     const qrTarget = (0, core_1.getInput)('qr-target') || undefined;
@@ -42103,7 +42105,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getUpdateGroupWebsite = exports.getUpdateGroupQr = exports.createUpdate = exports.assertEasVersion = void 0;
+exports.getUpdateGroupWebsite = exports.getUpdateGroupQr = exports.createUpdate = exports.parseEasUpdateOutput = exports.assertEasVersion = void 0;
 const exec_1 = __nccwpck_require__(1514);
 const io_1 = __nccwpck_require__(7436);
 const semver_1 = __importDefault(__nccwpck_require__(1383));
@@ -42126,24 +42128,11 @@ async function assertEasVersion(versionRange) {
     }
 }
 exports.assertEasVersion = assertEasVersion;
-/**
- * Create a new EAS Update using the user-provided command.
- * The command should be anything after `eas ...`.
- */
-async function createUpdate(cwd, command) {
-    let stdout = '';
-    try {
-        ({ stdout } = await (0, exec_1.getExecOutput)(command, undefined, {
-            cwd,
-        }));
-    }
-    catch (error) {
-        throw new Error(`Could not create a new EAS Update`, { cause: error });
-    }
+const parseEasUpdateOutput = (stdout) => {
     // Locate the start of the JSON data by finding the "Published!" marker.
     const startMarkerIndex = stdout.indexOf('Published!');
     if (startMarkerIndex === -1) {
-        throw new Error('Starting marker Published! not found.');
+        throw new Error('Starting marker --Published!-- not found.');
     }
     // Find the end of the JSON data using the "> NX" marker.
     const endMarker = ' >  NX   Successfully ran target';
@@ -42158,13 +42147,23 @@ async function createUpdate(cwd, command) {
         .replace(/\r/g, '')
         .replace(/\t/g, '')
         .trim();
+    return JSON.parse(jsonString);
+};
+exports.parseEasUpdateOutput = parseEasUpdateOutput;
+/**
+ * Create a new EAS Update using the user-provided command.
+ * The command should be anything after `eas ...`.
+ */
+async function createUpdate(cwd, command) {
+    let stdout = '';
     try {
-        const json = JSON.parse(jsonString);
-        return json;
+        ({ stdout } = await (0, exec_1.getExecOutput)(command, undefined, {
+            cwd,
+        }));
+        return (0, exports.parseEasUpdateOutput)(stdout);
     }
     catch (error) {
-        console.error('Failed to parse JSON', error);
-        throw error;
+        throw new Error(`Could not create a new EAS Update`, { cause: error });
     }
 }
 exports.createUpdate = createUpdate;

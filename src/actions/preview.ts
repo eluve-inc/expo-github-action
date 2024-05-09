@@ -8,6 +8,8 @@ import { loadProjectConfig } from '../project';
 import { template } from '../utils';
 import { executeAction } from '../worker';
 
+export { parseEasUpdateOutput } from '../eas';
+
 export const MESSAGE_ID = 'projectId:{projectId}';
 
 export function previewInput() {

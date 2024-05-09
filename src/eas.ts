@@ -47,25 +47,11 @@ export async function assertEasVersion(versionRange: string) {
   }
 }
 
-/**
- * Create a new EAS Update using the user-provided command.
- * The command should be anything after `eas ...`.
- */
-export async function createUpdate(cwd: string, command: string): Promise<EasUpdate[]> {
-  let stdout = '';
-
-  try {
-    ({ stdout } = await getExecOutput(command, undefined, {
-      cwd,
-    }));
-  } catch (error: unknown) {
-    throw new Error(`Could not create a new EAS Update`, { cause: error });
-  }
-
+export const parseEasUpdateOutput = (stdout: string): EasUpdate[] => {
   // Locate the start of the JSON data by finding the "Published!" marker.
   const startMarkerIndex = stdout.indexOf('Published!');
   if (startMarkerIndex === -1) {
-    throw new Error('Starting marker Published! not found.');
+    throw new Error('Starting marker --Published!-- not found.');
   }
   // Find the end of the JSON data using the "> NX" marker.
   const endMarker = ' >  NX   Successfully ran target';
@@ -82,12 +68,23 @@ export async function createUpdate(cwd: string, command: string): Promise<EasUpd
     .replace(/\t/g, '')
     .trim();
 
+  return JSON.parse(jsonString);
+};
+
+/**
+ * Create a new EAS Update using the user-provided command.
+ * The command should be anything after `eas ...`.
+ */
+export async function createUpdate(cwd: string, command: string): Promise<EasUpdate[]> {
+  let stdout = '';
+
   try {
-    const json = JSON.parse(jsonString);
-    return json;
-  } catch (error) {
-    console.error('Failed to parse JSON', error);
-    throw error;
+    ({ stdout } = await getExecOutput(command, undefined, {
+      cwd,
+    }));
+    return parseEasUpdateOutput(stdout);
+  } catch (error: unknown) {
+    throw new Error(`Could not create a new EAS Update`, { cause: error });
   }
 }
 

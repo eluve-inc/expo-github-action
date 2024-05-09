@@ -1,34 +1,4 @@
-function extractValidJson(stdout) {
-  // Locate the start of the JSON data by finding the "Published!" marker.
-  const startMarkerIndex = stdout.indexOf('Published!');
-  if (startMarkerIndex === -1) {
-    throw new Error('Starting marker Published! not found.');
-  }
-  // Find the end of the JSON data using the "> NX" marker.
-  const endMarker = ' >  NX   Successfully ran target ';
-  const endMarkerIndex = stdout.indexOf(endMarker, startMarkerIndex);
-  if (endMarkerIndex === -1) {
-    throw new Error('ending marker > NX Successfully not found.');
-  }
-
-  // Extract the substring that contains the JSON data.
-  const jsonString = stdout
-    .substring(startMarkerIndex + 'Published!'.length, endMarkerIndex)
-    .replace(/\n/g, '')
-    .replace(/\r/g, '')
-    .replace(/\t/g, '')
-    .trim();
-
-  try {
-    const json = JSON.parse(jsonString);
-    return json;
-  } catch (error) {
-    console.error('Failed to parse JSON', error);
-  }
-
-  return null;
-}
-
+const { parseEasUpdateOutput } = require('../build/preview');
 const testOutput = `
 [expo-cli] debug.html (390 B)
 - Exporting...
@@ -75,5 +45,5 @@ const testOutput = `
       `;
 
 // Run the test
-const jsonData = extractValidJson(testOutput);
+const jsonData = parseEasUpdateOutput(testOutput);
 console.log('Extracted JSON Data:', JSON.stringify(jsonData, null, 2));
