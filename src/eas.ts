@@ -30,9 +30,9 @@ export async function assertEasVersion(versionRange: string) {
   let stdout = '';
 
   try {
-    ({ stdout } = await getExecOutput(await which('eas', true), ['--version']));
+    ({ stdout } = await getExecOutput('pnpm eas', ['--version']));
   } catch {
-    throw new Error(`Could not verify the EAS CLI version, reason:\nCommand failed 'eas --version'`);
+    throw new Error(`Could not verify the EAS CLI version, reason:\nCommand failed 'pnpm eas --version'`);
   }
 
   const version = stdout.match(/eas-cli\/([^\s]+)/i);
@@ -84,6 +84,7 @@ export async function createUpdate(cwd: string, command: string): Promise<EasUpd
     }));
     return parseEasUpdateOutput(stdout);
   } catch (error: unknown) {
+    console.error(error);
     throw new Error(`Could not create a new EAS Update`, { cause: error });
   }
 }

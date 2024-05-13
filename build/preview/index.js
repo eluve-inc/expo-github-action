@@ -42107,17 +42107,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getUpdateGroupWebsite = exports.getUpdateGroupQr = exports.createUpdate = exports.parseEasUpdateOutput = exports.assertEasVersion = void 0;
 const exec_1 = __nccwpck_require__(1514);
-const io_1 = __nccwpck_require__(7436);
 const semver_1 = __importDefault(__nccwpck_require__(1383));
 const url_1 = __nccwpck_require__(7310);
 /** We can only run the `preview` sub-action with newer versions of EAS CLI */
 async function assertEasVersion(versionRange) {
     let stdout = '';
     try {
-        ({ stdout } = await (0, exec_1.getExecOutput)(await (0, io_1.which)('eas', true), ['--version']));
+        ({ stdout } = await (0, exec_1.getExecOutput)('pnpm eas', ['--version']));
     }
     catch {
-        throw new Error(`Could not verify the EAS CLI version, reason:\nCommand failed 'eas --version'`);
+        throw new Error(`Could not verify the EAS CLI version, reason:\nCommand failed 'pnpm eas --version'`);
     }
     const version = stdout.match(/eas-cli\/([^\s]+)/i);
     if (!version || !version[1]) {
@@ -42163,6 +42162,7 @@ async function createUpdate(cwd, command) {
         return (0, exports.parseEasUpdateOutput)(stdout);
     }
     catch (error) {
+        console.error(error);
         throw new Error(`Could not create a new EAS Update`, { cause: error });
     }
 }
