@@ -42127,22 +42127,24 @@ async function assertEasVersion(versionRange) {
     }
 }
 exports.assertEasVersion = assertEasVersion;
+const startMarker = `info Dependencies for 'mobile-expo' are up to date! No changes made.`;
+const endMarker = ' >  NX   Successfully ran target';
 const parseEasUpdateOutput = (stdout) => {
     // Locate the start of the JSON data by finding the "Published!" marker.
-    console.log('checking for text in stdout', stdout);
-    const startMarkerIndex = stdout.indexOf('Published!');
+    const startMarkerIndex = stdout.indexOf(startMarker);
     if (startMarkerIndex === -1) {
-        throw new Error('Starting marker --Published!-- not found.');
+        console.error(`could not find Starting marker (${startMarker}) in stdout.`);
+        throw new Error(`Starting marke not found.`);
     }
     // Find the end of the JSON data using the "> NX" marker.
-    const endMarker = ' >  NX   Successfully ran target';
     const endMarkerIndex = stdout.indexOf(endMarker, startMarkerIndex);
     if (endMarkerIndex === -1) {
-        throw new Error('ending marker > NX Successfully not found.');
+        console.error(`could not find ending marker (${endMarker}) in stdout.`);
+        throw new Error('ending marker not found.');
     }
     // Extract the substring that contains the JSON data.
     const jsonString = stdout
-        .substring(startMarkerIndex + 'Published!'.length, endMarkerIndex)
+        .substring(startMarkerIndex + startMarker.length, endMarkerIndex)
         .replace(/\n/g, '')
         .replace(/\r/g, '')
         .replace(/\t/g, '')
