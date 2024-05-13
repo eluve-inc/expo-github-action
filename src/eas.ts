@@ -47,7 +47,7 @@ export async function assertEasVersion(versionRange: string) {
   }
 }
 
-const startMarker = `info Dependencies for 'mobile-expo' are up to date! No changes made.`;
+const startMarker = `Dependencies for 'mobile-expo' are up to date! No changes made.`;
 const endMarker = ' >  NX   Successfully ran target';
 
 export const parseEasUpdateOutput = (stdout: string): EasUpdate[] => {

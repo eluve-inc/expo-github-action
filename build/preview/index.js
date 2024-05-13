@@ -42127,7 +42127,7 @@ async function assertEasVersion(versionRange) {
     }
 }
 exports.assertEasVersion = assertEasVersion;
-const startMarker = `info Dependencies for 'mobile-expo' are up to date! No changes made.`;
+const startMarker = `Dependencies for 'mobile-expo' are up to date! No changes made.`;
 const endMarker = ' >  NX   Successfully ran target';
 const parseEasUpdateOutput = (stdout) => {
     console.log(`***** looking for markers *********`);
