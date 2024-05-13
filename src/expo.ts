@@ -142,6 +142,35 @@ export async function easBuild(cmd: Command): Promise<BuildInfo[]> {
   return JSON.parse(stdout);
 }
 
+const startMarker = `Dependencies for 'mobile-expo' are up to date! No changes made.`;
+const endMarker = ' >  NX   Successfully ran target';
+export const parseEasUpdateOutput = (stdout: string): BuildInfo[] => {
+  console.log(`***** looking for markers *********`);
+  console.log(stdout);
+  // Locate the start of the JSON data by finding the "Published!" marker.
+  const startMarkerIndex = stdout.indexOf(startMarker);
+  if (startMarkerIndex === -1) {
+    console.error(`could not find Starting marker (${startMarker}) in stdout.`);
+    throw new Error(`Starting marke not found.`);
+  }
+  // Find the end of the JSON data using the "> NX" marker.
+  const endMarkerIndex = stdout.indexOf(endMarker, startMarkerIndex);
+  if (endMarkerIndex === -1) {
+    console.error(`could not find ending marker (${endMarker}) in stdout.`);
+    throw new Error('ending marker not found.');
+  }
+
+  // Extract the substring that contains the JSON data.
+  const jsonString = stdout
+    .substring(startMarkerIndex + startMarker.length, endMarkerIndex)
+    .replace(/\n/g, '')
+    .replace(/\r/g, '')
+    .replace(/\t/g, '')
+    .trim();
+
+  return JSON.parse(jsonString);
+};
+
 /**
  * Create an new EAS build using the user-provided command.
  */
@@ -164,12 +193,14 @@ export async function createEasBuildFromRawCommandAsync(
   }
 
   try {
-    ({ stdout } = await getExecOutput((await which('eas', true)) + ` ${cmd}`, extraArgs, {
+    ({ stdout } = await getExecOutput(command, extraArgs, {
       cwd,
     }));
   } catch (error: unknown) {
-    throw new Error(`Could not run command eas build`, { cause: error });
+    throw new Error(`Could not run command ${command}`, { cause: error });
   }
+
+  console.log('looking for BuildInfo[] in stdout', stdout);
 
   return JSON.parse(stdout);
 }
@@ -179,7 +210,8 @@ export async function createEasBuildFromRawCommandAsync(
  */
 export async function cancelEasBuildAsync(cwd: string, buildId: string): Promise<void> {
   try {
-    await getExecOutput(await which('eas', true), ['build:cancel', buildId], { cwd });
+    // here
+    await getExecOutput('pnpm eas', ['build:cancel', buildId], { cwd });
   } catch (error: unknown) {
     info(`Failed to cancel build ${buildId}: ${String(error)}`);
   }
@@ -190,7 +222,8 @@ export async function cancelEasBuildAsync(cwd: string, buildId: string): Promise
  */
 export async function queryEasBuildInfoAsync(cwd: string, buildId: string): Promise<BuildInfo | null> {
   try {
-    const { stdout } = await getExecOutput(await which('eas', true), ['build:view', buildId, '--json'], {
+    // here
+    const { stdout } = await getExecOutput('pnpm eas', ['build:view', buildId, '--json'], {
       cwd,
       silent: true,
     });
@@ -208,7 +241,8 @@ export async function projectInfo(dir: string): Promise<ProjectInfo> {
   let stdout = '';
 
   try {
-    ({ stdout } = await getExecOutput(await which('expo', true), ['config', '--json', '--type', 'prebuild'], {
+    //here
+    ({ stdout } = await getExecOutput('pnpm expo', ['config', '--json', '--type', 'prebuild'], {
       cwd: dir,
       silent: true,
     }));

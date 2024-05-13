@@ -91,12 +91,13 @@ export async function previewAction(input = collectPreviewBuildActionInput()) {
   info('Fingerprint is changed, creating new builds...');
   info(`Fingerprint diff: ${JSON.stringify(diff, null, 2)}`);
   await maybeCancelPreviousBuildsAsync(config, input);
-  const command = sanitizeCommand(input.command);
+  // const command = sanitizeCommand(input.command);
+  const command = input.command;
   const buildMessage =
     input.easBuildMessage ||
     (await getGitCommandMessageAsync({ token: input.githubToken }, input.currentGitCommitHash));
   const args = ['--message', buildMessage];
-  const builds = await group(`Run eas ${command}"`, () =>
+  const builds = await group(`Running command: ${command}"`, () =>
     createEasBuildFromRawCommandAsync(input.workingDirectory, command, args)
   );
 
