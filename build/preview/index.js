@@ -42130,6 +42130,8 @@ exports.assertEasVersion = assertEasVersion;
 const startMarker = `info Dependencies for 'mobile-expo' are up to date! No changes made.`;
 const endMarker = ' >  NX   Successfully ran target';
 const parseEasUpdateOutput = (stdout) => {
+    console.log(`***** looking for markers *********`);
+    console.log(stdout);
     // Locate the start of the JSON data by finding the "Published!" marker.
     const startMarkerIndex = stdout.indexOf(startMarker);
     if (startMarkerIndex === -1) {

@@ -51,6 +51,8 @@ const startMarker = `info Dependencies for 'mobile-expo' are up to date! No chan
 const endMarker = ' >  NX   Successfully ran target';
 
 export const parseEasUpdateOutput = (stdout: string): EasUpdate[] => {
+  console.log(`***** looking for markers *********`);
+  console.log(stdout);
   // Locate the start of the JSON data by finding the "Published!" marker.
   const startMarkerIndex = stdout.indexOf(startMarker);
   if (startMarkerIndex === -1) {
