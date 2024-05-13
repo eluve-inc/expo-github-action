@@ -42129,6 +42129,7 @@ async function assertEasVersion(versionRange) {
 exports.assertEasVersion = assertEasVersion;
 const parseEasUpdateOutput = (stdout) => {
     // Locate the start of the JSON data by finding the "Published!" marker.
+    console.log('checking for text in stdout', stdout);
     const startMarkerIndex = stdout.indexOf('Published!');
     if (startMarkerIndex === -1) {
         throw new Error('Starting marker --Published!-- not found.');
