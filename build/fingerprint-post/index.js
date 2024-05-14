@@ -89163,6 +89163,7 @@ function collectFingerprintActionInput() {
         packager: (0, core_1.getInput)('packager') || 'yarn',
         githubToken: (0, core_1.getInput)('github-token'),
         workingDirectory: (0, core_1.getInput)('working-directory'),
+        projectRoot: (0, core_1.getInput)('project-root'),
         fingerprintVersion: (0, core_1.getInput)('fingerprint-version') || 'latest',
         fingerprintInstallationCache: !(0, core_1.getInput)('fingerprint-installation-cache') || (0, core_1.getBooleanInput)('fingerprint-installation-cache'),
         fingerprintDbCacheKey: (0, core_1.getInput)('fingerprint-db-cache-key'),

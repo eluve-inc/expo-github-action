@@ -88827,7 +88827,7 @@ function collectPreviewBuildActionInput() {
 exports.collectPreviewBuildActionInput = collectPreviewBuildActionInput;
 (0, worker_1.executeAction)(previewAction);
 async function previewAction(input = collectPreviewBuildActionInput()) {
-    const config = await (0, project_1.loadProjectConfig)(input.workingDirectory);
+    const config = await (0, project_1.loadProjectConfig)(input.projectRoot);
     if (!config.extra?.eas?.projectId) {
         return (0, core_1.setFailed)('Missing "extra.eas.projectId" in app.json or app.config.js. Please run `eas build:configure` first.');
     }
@@ -89792,6 +89792,7 @@ function collectFingerprintActionInput() {
         packager: (0, core_1.getInput)('packager') || 'yarn',
         githubToken: (0, core_1.getInput)('github-token'),
         workingDirectory: (0, core_1.getInput)('working-directory'),
+        projectRoot: (0, core_1.getInput)('project-root'),
         fingerprintVersion: (0, core_1.getInput)('fingerprint-version') || 'latest',
         fingerprintInstallationCache: !(0, core_1.getInput)('fingerprint-installation-cache') || (0, core_1.getBooleanInput)('fingerprint-installation-cache'),
         fingerprintDbCacheKey: (0, core_1.getInput)('fingerprint-db-cache-key'),

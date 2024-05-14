@@ -41894,19 +41894,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getUpdateGroupWebsite = exports.getUpdateGroupQr = exports.createUpdate = exports.assertEasVersion = void 0;
+exports.getUpdateGroupWebsite = exports.getUpdateGroupQr = exports.createUpdate = exports.parseEasUpdateOutput = exports.assertEasVersion = void 0;
 const exec_1 = __nccwpck_require__(1514);
-const io_1 = __nccwpck_require__(7436);
 const semver_1 = __importDefault(__nccwpck_require__(1383));
 const url_1 = __nccwpck_require__(7310);
 /** We can only run the `preview` sub-action with newer versions of EAS CLI */
 async function assertEasVersion(versionRange) {
     let stdout = '';
     try {
-        ({ stdout } = await (0, exec_1.getExecOutput)(await (0, io_1.which)('eas', true), ['--version']));
+        ({ stdout } = await (0, exec_1.getExecOutput)('pnpm eas', ['--version']));
     }
     catch {
-        throw new Error(`Could not verify the EAS CLI version, reason:\nCommand failed 'eas --version'`);
+        throw new Error(`Could not verify the EAS CLI version, reason:\nCommand failed 'pnpm eas --version'`);
     }
     const version = stdout.match(/eas-cli\/([^\s]+)/i);
     if (!version || !version[1]) {
@@ -41917,6 +41916,33 @@ async function assertEasVersion(versionRange) {
     }
 }
 exports.assertEasVersion = assertEasVersion;
+const startMarker = `Dependencies for 'mobile-expo' are up to date! No changes made.`;
+const endMarker = ' >  NX   Successfully ran target';
+const parseEasUpdateOutput = (stdout) => {
+    console.log(`***** looking for markers *********`);
+    console.log(stdout);
+    // Locate the start of the JSON data by finding the "Published!" marker.
+    const startMarkerIndex = stdout.indexOf(startMarker);
+    if (startMarkerIndex === -1) {
+        console.error(`could not find Starting marker (${startMarker}) in stdout.`);
+        throw new Error(`Starting marke not found.`);
+    }
+    // Find the end of the JSON data using the "> NX" marker.
+    const endMarkerIndex = stdout.indexOf(endMarker, startMarkerIndex);
+    if (endMarkerIndex === -1) {
+        console.error(`could not find ending marker (${endMarker}) in stdout.`);
+        throw new Error('ending marker not found.');
+    }
+    // Extract the substring that contains the JSON data.
+    const jsonString = stdout
+        .substring(startMarkerIndex + startMarker.length, endMarkerIndex)
+        .replace(/\n/g, '')
+        .replace(/\r/g, '')
+        .replace(/\t/g, '')
+        .trim();
+    return JSON.parse(jsonString);
+};
+exports.parseEasUpdateOutput = parseEasUpdateOutput;
 /**
  * Create a new EAS Update using the user-provided command.
  * The command should be anything after `eas ...`.
@@ -41927,30 +41953,12 @@ async function createUpdate(cwd, command) {
         ({ stdout } = await (0, exec_1.getExecOutput)(command, undefined, {
             cwd,
         }));
+        return (0, exports.parseEasUpdateOutput)(stdout);
     }
     catch (error) {
+        console.error(error);
         throw new Error(`Could not create a new EAS Update`, { cause: error });
     }
-
-
-  // try {
-  //   // Execute the passed in command directly
-  //   ({ stdout } = await getExecOutput(command, undefined, {
-  //     cwd,
-  //   }));
-  // } catch (error: unknown) {
-  //   throw new Error(`Failed to execute command: "${command}"`, { cause: error });
-  // }
-
-  try {
-    // Execute the passed in command directly
-    ({ stdout } = await getExecOutput(command, undefined, {
-      cwd,
-    }));
-  } catch (error: unknown) {
-    throw new Error(`Failed to execute command: "${command}"`, { cause: error });
-  }
-    return JSON.parse(stdout);
 }
 exports.createUpdate = createUpdate;
 /**
@@ -41987,7 +41995,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getBuildLogsUrl = exports.projectDeepLink = exports.projectLink = exports.projectQR = exports.projectAppType = exports.projectInfo = exports.queryEasBuildInfoAsync = exports.cancelEasBuildAsync = exports.createEasBuildFromRawCommandAsync = exports.easBuild = exports.runCommand = exports.projectOwner = exports.authenticate = exports.parseCommand = exports.appPlatformEmojis = exports.appPlatformDisplayNames = exports.AppPlatform = void 0;
+exports.getBuildLogsUrl = exports.projectDeepLink = exports.projectLink = exports.projectQR = exports.projectAppType = exports.projectInfo = exports.queryEasBuildInfoAsync = exports.cancelEasBuildAsync = exports.createEasBuildFromRawCommandAsync = exports.parseEasUpdateOutput = exports.easBuild = exports.runCommand = exports.projectOwner = exports.authenticate = exports.parseCommand = exports.appPlatformEmojis = exports.appPlatformDisplayNames = exports.AppPlatform = void 0;
 const core_1 = __nccwpck_require__(2186);
 const exec_1 = __nccwpck_require__(1514);
 const io_1 = __nccwpck_require__(7436);
@@ -42088,6 +42096,33 @@ async function easBuild(cmd) {
     return JSON.parse(stdout);
 }
 exports.easBuild = easBuild;
+const startMarker = `Dependencies for 'mobile-expo' are up to date! No changes made.`;
+const endMarker = ' >  NX   Successfully ran target';
+const parseEasUpdateOutput = (stdout) => {
+    console.log(`***** looking for markers *********`);
+    console.log(stdout);
+    // Locate the start of the JSON data by finding the "Published!" marker.
+    const startMarkerIndex = stdout.indexOf(startMarker);
+    if (startMarkerIndex === -1) {
+        console.error(`could not find Starting marker (${startMarker}) in stdout.`);
+        throw new Error(`Starting marke not found.`);
+    }
+    // Find the end of the JSON data using the "> NX" marker.
+    const endMarkerIndex = stdout.indexOf(endMarker, startMarkerIndex);
+    if (endMarkerIndex === -1) {
+        console.error(`could not find ending marker (${endMarker}) in stdout.`);
+        throw new Error('ending marker not found.');
+    }
+    // Extract the substring that contains the JSON data.
+    const jsonString = stdout
+        .substring(startMarkerIndex + startMarker.length, endMarkerIndex)
+        .replace(/\n/g, '')
+        .replace(/\r/g, '')
+        .replace(/\t/g, '')
+        .trim();
+    return JSON.parse(jsonString);
+};
+exports.parseEasUpdateOutput = parseEasUpdateOutput;
 /**
  * Create an new EAS build using the user-provided command.
  */
@@ -42104,13 +42139,14 @@ async function createEasBuildFromRawCommandAsync(cwd, command, extraArgs = []) {
         cmd += ' --no-wait';
     }
     try {
-        ({ stdout } = await (0, exec_1.getExecOutput)((await (0, io_1.which)('eas', true)) + ` ${cmd}`, extraArgs, {
+        ({ stdout } = await (0, exec_1.getExecOutput)(command, extraArgs, {
             cwd,
         }));
     }
     catch (error) {
-        throw new Error(`Could not run command eas build`, { cause: error });
+        throw new Error(`Could not run command ${command}`, { cause: error });
     }
+    console.log('looking for BuildInfo[] in stdout', stdout);
     return JSON.parse(stdout);
 }
 exports.createEasBuildFromRawCommandAsync = createEasBuildFromRawCommandAsync;
@@ -42119,7 +42155,8 @@ exports.createEasBuildFromRawCommandAsync = createEasBuildFromRawCommandAsync;
  */
 async function cancelEasBuildAsync(cwd, buildId) {
     try {
-        await (0, exec_1.getExecOutput)(await (0, io_1.which)('eas', true), ['build:cancel', buildId], { cwd });
+        // here
+        await (0, exec_1.getExecOutput)('pnpm eas', ['build:cancel', buildId], { cwd });
     }
     catch (error) {
         (0, core_1.info)(`Failed to cancel build ${buildId}: ${String(error)}`);
@@ -42131,7 +42168,8 @@ exports.cancelEasBuildAsync = cancelEasBuildAsync;
  */
 async function queryEasBuildInfoAsync(cwd, buildId) {
     try {
-        const { stdout } = await (0, exec_1.getExecOutput)(await (0, io_1.which)('eas', true), ['build:view', buildId, '--json'], {
+        // here
+        const { stdout } = await (0, exec_1.getExecOutput)('pnpm eas', ['build:view', buildId, '--json'], {
             cwd,
             silent: true,
         });
@@ -42149,7 +42187,8 @@ exports.queryEasBuildInfoAsync = queryEasBuildInfoAsync;
 async function projectInfo(dir) {
     let stdout = '';
     try {
-        ({ stdout } = await (0, exec_1.getExecOutput)(await (0, io_1.which)('expo', true), ['config', '--json', '--type', 'prebuild'], {
+        //here
+        ({ stdout } = await (0, exec_1.getExecOutput)('pnpm expo', ['config', '--json', '--type', 'prebuild'], {
             cwd: dir,
             silent: true,
         }));
@@ -42309,7 +42348,7 @@ function pullContext() {
     if (process.env['EXPO_TEST_GITHUB_PULL']) {
         return { ...github_1.context.repo, number: Number(process.env['EXPO_TEST_GITHUB_PULL']) };
     }
-    (0, assert_1.ok)(github_1.context.eventName === 'pull_request', 'Could not find the pull request context, make sure to run this from a pull_request triggered workflow');
+    (0, assert_1.ok)(['pull_request', 'issue_comment'].includes(github_1.context.eventName), 'Could not find the pull request context, make sure to run this from a pull_request triggered workflow');
     return github_1.context.issue;
 }
 exports.pullContext = pullContext;
