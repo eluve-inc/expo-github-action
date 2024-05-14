@@ -119,21 +119,6 @@ export async function previewAction(input = collectPreviewBuildActionInput()) {
   setOutputs(variables, messageId, messageBody);
 }
 
-/**
- * Validate and sanitize the command that creates the update.
- * It also ensures that the command starts with `eas ...` to make sure we can run it.
- */
-function sanitizeCommand(input: string): string {
-  let command = input.trim();
-
-  if (!command.startsWith('eas')) {
-    throw new Error(`The command must start with "eas", received "${command}"`);
-  } else {
-    command = command.replace(/^eas/, '').trim();
-  }
-  return command;
-}
-
 async function maybeCancelPreviousBuildsAsync(
   config: ExpoConfig,
   input: ReturnType<typeof collectPreviewBuildActionInput>

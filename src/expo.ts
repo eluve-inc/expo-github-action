@@ -142,34 +142,32 @@ export async function easBuild(cmd: Command): Promise<BuildInfo[]> {
   return JSON.parse(stdout);
 }
 
-const startMarker = `Dependencies for 'mobile-expo' are up to date! No changes made.`;
-const endMarker = ' >  NX   Successfully ran target';
-export const parseEasUpdateOutput = (stdout: string): BuildInfo[] => {
-  console.log(`***** looking for markers *********`);
-  console.log(stdout);
-  // Locate the start of the JSON data by finding the "Published!" marker.
-  const startMarkerIndex = stdout.indexOf(startMarker);
-  if (startMarkerIndex === -1) {
-    console.error(`could not find Starting marker (${startMarker}) in stdout.`);
-    throw new Error(`Starting marke not found.`);
-  }
-  // Find the end of the JSON data using the "> NX" marker.
-  const endMarkerIndex = stdout.indexOf(endMarker, startMarkerIndex);
-  if (endMarkerIndex === -1) {
-    console.error(`could not find ending marker (${endMarker}) in stdout.`);
-    throw new Error('ending marker not found.');
+export function parseEasBuildInfo(stdout: string): BuildInfo[] {
+  console.log('parsing out buildInfos from stdout', stdout);
+
+  const regex = /\[\s*{[\s\S]*}\s*\]/; // This assumes no nested arrays
+  const match = stdout.match(regex);
+
+  if (!match) {
+    console.error('No JSON array found in stdout with regex', regex);
+    throw new Error('No JSON array found');
   }
 
-  // Extract the substring that contains the JSON data.
-  const jsonString = stdout
-    .substring(startMarkerIndex + startMarker.length, endMarkerIndex)
-    .replace(/\n/g, '')
-    .replace(/\r/g, '')
-    .replace(/\t/g, '')
-    .trim();
+  try {
+    const buildInfos = JSON.parse(match[0]) as BuildInfo[];
 
-  return JSON.parse(jsonString);
-};
+    console.log('parsed out buildInfos', buildInfos);
+
+    if (buildInfos.length === 0 || !buildInfos.every(bi => bi.distribution !== undefined)) {
+      throw new Error('No valid buildInfos found');
+    }
+
+    return buildInfos;
+  } catch (e) {
+    console.error('Error parsing buildInfo JSON:', e);
+    throw new Error('Failed to parse buildInfos');
+  }
+}
 
 /**
  * Create an new EAS build using the user-provided command.
@@ -200,9 +198,7 @@ export async function createEasBuildFromRawCommandAsync(
     throw new Error(`Could not run command ${command}`, { cause: error });
   }
 
-  console.log('looking for BuildInfo[] in stdout', stdout);
-
-  return JSON.parse(stdout);
+  return parseEasBuildInfo(stdout);
 }
 
 /**

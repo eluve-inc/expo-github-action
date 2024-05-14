@@ -88886,20 +88886,6 @@ async function previewAction(input = collectPreviewBuildActionInput()) {
     setOutputs(variables, messageId, messageBody);
 }
 exports.previewAction = previewAction;
-/**
- * Validate and sanitize the command that creates the update.
- * It also ensures that the command starts with `eas ...` to make sure we can run it.
- */
-function sanitizeCommand(input) {
-    let command = input.trim();
-    if (!command.startsWith('eas')) {
-        throw new Error(`The command must start with "eas", received "${command}"`);
-    }
-    else {
-        command = command.replace(/^eas/, '').trim();
-    }
-    return command;
-}
 async function maybeCancelPreviousBuildsAsync(config, input) {
     const variables = getVariables(config, []);
     const messageId = (0, utils_1.template)(input.commentId, variables);
@@ -89300,7 +89286,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getBuildLogsUrl = exports.projectDeepLink = exports.projectLink = exports.projectQR = exports.projectAppType = exports.projectInfo = exports.queryEasBuildInfoAsync = exports.cancelEasBuildAsync = exports.createEasBuildFromRawCommandAsync = exports.parseEasUpdateOutput = exports.easBuild = exports.runCommand = exports.projectOwner = exports.authenticate = exports.parseCommand = exports.appPlatformEmojis = exports.appPlatformDisplayNames = exports.AppPlatform = void 0;
+exports.getBuildLogsUrl = exports.projectDeepLink = exports.projectLink = exports.projectQR = exports.projectAppType = exports.projectInfo = exports.queryEasBuildInfoAsync = exports.cancelEasBuildAsync = exports.createEasBuildFromRawCommandAsync = exports.parseEasBuildInfo = exports.easBuild = exports.runCommand = exports.projectOwner = exports.authenticate = exports.parseCommand = exports.appPlatformEmojis = exports.appPlatformDisplayNames = exports.AppPlatform = void 0;
 const core_1 = __nccwpck_require__(2186);
 const exec_1 = __nccwpck_require__(1514);
 const io_1 = __nccwpck_require__(7436);
@@ -89401,33 +89387,28 @@ async function easBuild(cmd) {
     return JSON.parse(stdout);
 }
 exports.easBuild = easBuild;
-const startMarker = `Dependencies for 'mobile-expo' are up to date! No changes made.`;
-const endMarker = ' >  NX   Successfully ran target';
-const parseEasUpdateOutput = (stdout) => {
-    console.log(`***** looking for markers *********`);
-    console.log(stdout);
-    // Locate the start of the JSON data by finding the "Published!" marker.
-    const startMarkerIndex = stdout.indexOf(startMarker);
-    if (startMarkerIndex === -1) {
-        console.error(`could not find Starting marker (${startMarker}) in stdout.`);
-        throw new Error(`Starting marke not found.`);
+function parseEasBuildInfo(stdout) {
+    console.log('parsing out buildInfos from stdout', stdout);
+    const regex = /\[\s*{[\s\S]*}\s*\]/; // This assumes no nested arrays
+    const match = stdout.match(regex);
+    if (!match) {
+        console.error('No JSON array found in stdout with regex', regex);
+        throw new Error('No JSON array found');
     }
-    // Find the end of the JSON data using the "> NX" marker.
-    const endMarkerIndex = stdout.indexOf(endMarker, startMarkerIndex);
-    if (endMarkerIndex === -1) {
-        console.error(`could not find ending marker (${endMarker}) in stdout.`);
-        throw new Error('ending marker not found.');
+    try {
+        const buildInfos = JSON.parse(match[0]);
+        console.log('parsed out buildInfos', buildInfos);
+        if (buildInfos.length === 0 || !buildInfos.every(bi => bi.distribution !== undefined)) {
+            throw new Error('No valid buildInfos found');
+        }
+        return buildInfos;
     }
-    // Extract the substring that contains the JSON data.
-    const jsonString = stdout
-        .substring(startMarkerIndex + startMarker.length, endMarkerIndex)
-        .replace(/\n/g, '')
-        .replace(/\r/g, '')
-        .replace(/\t/g, '')
-        .trim();
-    return JSON.parse(jsonString);
-};
-exports.parseEasUpdateOutput = parseEasUpdateOutput;
+    catch (e) {
+        console.error('Error parsing buildInfo JSON:', e);
+        throw new Error('Failed to parse buildInfos');
+    }
+}
+exports.parseEasBuildInfo = parseEasBuildInfo;
 /**
  * Create an new EAS build using the user-provided command.
  */
@@ -89451,8 +89432,7 @@ async function createEasBuildFromRawCommandAsync(cwd, command, extraArgs = []) {
     catch (error) {
         throw new Error(`Could not run command ${command}`, { cause: error });
     }
-    console.log('looking for BuildInfo[] in stdout', stdout);
-    return JSON.parse(stdout);
+    return parseEasBuildInfo(stdout);
 }
 exports.createEasBuildFromRawCommandAsync = createEasBuildFromRawCommandAsync;
 /**
