@@ -54,6 +54,9 @@ inputs:
   saving-db-branch:
     description: The branch for saving the fingerprint database. Defaults to the repository's default branch
     required: false
+  eas-command:
+    description: command that invokes eas cli
+    required: true
 
 outputs:
   projectId:

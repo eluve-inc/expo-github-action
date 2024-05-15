@@ -88819,6 +88819,7 @@ function collectPreviewBuildActionInput() {
     return {
         ...(0, fingerprint_1.collectFingerprintActionInput)(),
         command: (0, core_1.getInput)('command'),
+        easCommand: (0, core_1.getInput)('eas-command'),
         shouldComment: !(0, core_1.getInput)('comment') || (0, core_1.getBooleanInput)('comment'),
         commentId: (0, core_1.getInput)('comment-id') || exports.MESSAGE_ID,
         easBuildMessage: (0, core_1.getInput)('eas-build-message'),
@@ -88852,7 +88853,7 @@ async function previewAction(input = collectPreviewBuildActionInput()) {
         const messageId = (0, utils_1.template)(input.commentId, variables);
         const latestEasEntity = await dbManager.getLatestEasEntityFromFingerprintAsync(currentFingerprint.hash);
         const latestEasBuildInfo = latestEasEntity?.easBuildId
-            ? await (0, expo_1.queryEasBuildInfoAsync)(input.workingDirectory, latestEasEntity.easBuildId)
+            ? await (0, expo_1.queryEasBuildInfoAsync)(input.easCommand, input.workingDirectory, latestEasEntity.easBuildId)
             : null;
         const messageBody = createMessageBodyFingerprintCompatible(latestEasBuildInfo);
         await maybeCreateCommentAsync(input, messageId, messageBody);
@@ -88900,7 +88901,7 @@ async function maybeCancelPreviousBuildsAsync(config, input) {
     const easBuildIds = parseCommentForEasMetadata(comment.body);
     for (const buildId of easBuildIds) {
         (0, core_1.info)(`Canceling previous build: ${buildId}`);
-        await (0, expo_1.cancelEasBuildAsync)(input.workingDirectory, buildId);
+        await (0, expo_1.cancelEasBuildAsync)(input.easCommand, input.workingDirectory, buildId);
     }
 }
 //#region Comments
@@ -89438,10 +89439,10 @@ exports.createEasBuildFromRawCommandAsync = createEasBuildFromRawCommandAsync;
 /**
  * Cancel an EAS build.
  */
-async function cancelEasBuildAsync(cwd, buildId) {
+async function cancelEasBuildAsync(easCommand, cwd, buildId) {
     try {
         // here
-        await (0, exec_1.getExecOutput)('pnpm eas', ['build:cancel', buildId], { cwd });
+        await (0, exec_1.getExecOutput)(easCommand, ['build:cancel', buildId], { cwd });
     }
     catch (error) {
         (0, core_1.info)(`Failed to cancel build ${buildId}: ${String(error)}`);
@@ -89451,10 +89452,10 @@ exports.cancelEasBuildAsync = cancelEasBuildAsync;
 /**
  * Query the EAS BuildInfo from given buildId.
  */
-async function queryEasBuildInfoAsync(cwd, buildId) {
+async function queryEasBuildInfoAsync(easCommand, cwd, buildId) {
     try {
         // here
-        const { stdout } = await (0, exec_1.getExecOutput)('pnpm eas', ['build:view', buildId, '--json'], {
+        const { stdout } = await (0, exec_1.getExecOutput)(easCommand, ['build:view', buildId, '--json'], {
             cwd,
             silent: true,
         });
@@ -89772,6 +89773,7 @@ function collectFingerprintActionInput() {
         packager: (0, core_1.getInput)('packager') || 'yarn',
         githubToken: (0, core_1.getInput)('github-token'),
         workingDirectory: (0, core_1.getInput)('working-directory'),
+        easCommand: (0, core_1.getInput)('eas-command'),
         projectRoot: (0, core_1.getInput)('project-root'),
         fingerprintVersion: (0, core_1.getInput)('fingerprint-version') || 'latest',
         fingerprintInstallationCache: !(0, core_1.getInput)('fingerprint-installation-cache') || (0, core_1.getBooleanInput)('fingerprint-installation-cache'),

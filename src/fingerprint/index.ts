@@ -76,6 +76,7 @@ export function collectFingerprintActionInput() {
     packager: getInput('packager') || 'yarn',
     githubToken: getInput('github-token'),
     workingDirectory: getInput('working-directory'),
+    easCommand: getInput('eas-command'),
     projectRoot: getInput('project-root'),
     fingerprintVersion: getInput('fingerprint-version') || 'latest',
     fingerprintInstallationCache:

@@ -89072,10 +89072,10 @@ exports.createEasBuildFromRawCommandAsync = createEasBuildFromRawCommandAsync;
 /**
  * Cancel an EAS build.
  */
-async function cancelEasBuildAsync(cwd, buildId) {
+async function cancelEasBuildAsync(easCommand, cwd, buildId) {
     try {
         // here
-        await (0, exec_1.getExecOutput)('pnpm eas', ['build:cancel', buildId], { cwd });
+        await (0, exec_1.getExecOutput)(easCommand, ['build:cancel', buildId], { cwd });
     }
     catch (error) {
         (0, core_1.info)(`Failed to cancel build ${buildId}: ${String(error)}`);
@@ -89085,10 +89085,10 @@ exports.cancelEasBuildAsync = cancelEasBuildAsync;
 /**
  * Query the EAS BuildInfo from given buildId.
  */
-async function queryEasBuildInfoAsync(cwd, buildId) {
+async function queryEasBuildInfoAsync(easCommand, cwd, buildId) {
     try {
         // here
-        const { stdout } = await (0, exec_1.getExecOutput)('pnpm eas', ['build:view', buildId, '--json'], {
+        const { stdout } = await (0, exec_1.getExecOutput)(easCommand, ['build:view', buildId, '--json'], {
             cwd,
             silent: true,
         });

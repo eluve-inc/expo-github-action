@@ -42,6 +42,7 @@ export function collectPreviewBuildActionInput() {
   return {
     ...collectFingerprintActionInput(),
     command: getInput('command'),
+    easCommand: getInput('eas-command'),
     shouldComment: !getInput('comment') || getBooleanInput('comment'),
     commentId: getInput('comment-id') || MESSAGE_ID,
     easBuildMessage: getInput('eas-build-message'),
@@ -80,7 +81,7 @@ export async function previewAction(input = collectPreviewBuildActionInput()) {
     const messageId = template(input.commentId, variables);
     const latestEasEntity = await dbManager.getLatestEasEntityFromFingerprintAsync(currentFingerprint.hash);
     const latestEasBuildInfo = latestEasEntity?.easBuildId
-      ? await queryEasBuildInfoAsync(input.workingDirectory, latestEasEntity.easBuildId)
+      ? await queryEasBuildInfoAsync(input.easCommand, input.workingDirectory, latestEasEntity.easBuildId)
       : null;
     const messageBody = createMessageBodyFingerprintCompatible(latestEasBuildInfo);
     await maybeCreateCommentAsync(input, messageId, messageBody);
@@ -136,7 +137,7 @@ async function maybeCancelPreviousBuildsAsync(
   const easBuildIds = parseCommentForEasMetadata(comment.body);
   for (const buildId of easBuildIds) {
     info(`Canceling previous build: ${buildId}`);
-    await cancelEasBuildAsync(input.workingDirectory, buildId);
+    await cancelEasBuildAsync(input.easCommand, input.workingDirectory, buildId);
   }
 }
 
