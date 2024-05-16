@@ -38699,7 +38699,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getBuildLogsUrl = exports.projectDeepLink = exports.projectLink = exports.projectQR = exports.projectAppType = exports.projectInfo = exports.queryEasBuildInfoAsync = exports.cancelEasBuildAsync = exports.createEasBuildFromRawCommandAsync = exports.parseEasBuildInfo = exports.easBuild = exports.runCommand = exports.projectOwner = exports.authenticate = exports.parseCommand = exports.appPlatformEmojis = exports.appPlatformDisplayNames = exports.AppPlatform = void 0;
+exports.getBuildLogsUrl = exports.projectDeepLink = exports.projectLink = exports.projectQR = exports.projectAppType = exports.projectInfo = exports.queryEasBuildInfoAsync = exports.extractBuildInfo = exports.cancelEasBuildAsync = exports.createEasBuildFromRawCommandAsync = exports.parseEasBuildInfo = exports.easBuild = exports.runCommand = exports.projectOwner = exports.authenticate = exports.parseCommand = exports.appPlatformEmojis = exports.appPlatformDisplayNames = exports.AppPlatform = void 0;
 const core_1 = __nccwpck_require__(2186);
 const exec_1 = __nccwpck_require__(1514);
 const io_1 = __nccwpck_require__(7436);
@@ -38853,7 +38853,6 @@ exports.createEasBuildFromRawCommandAsync = createEasBuildFromRawCommandAsync;
  */
 async function cancelEasBuildAsync(easCommand, cwd, buildId) {
     try {
-        // here
         await (0, exec_1.getExecOutput)(easCommand, ['build:cancel', buildId], { cwd });
     }
     catch (error) {
@@ -38861,17 +38860,33 @@ async function cancelEasBuildAsync(easCommand, cwd, buildId) {
     }
 }
 exports.cancelEasBuildAsync = cancelEasBuildAsync;
+function extractBuildInfo(stdout) {
+    console.log('parsing out BuildInfo from stdout', stdout);
+    const regex = /{(?:[^{}]|{(?:[^{}]|{[^{}]*})*})*?"platform":\s*"[^"]*"(?:[^{}]|{(?:[^{}]|{[^{}]*})*})*?}/s;
+    const match = stdout.match(regex);
+    if (!match) {
+        console.error('No BuildInfo found in stdout with regex', regex);
+        throw new Error('No BuildInfo found in stdout');
+    }
+    console.log(match[0]);
+    const buildInfo = JSON.parse(match[0]);
+    console.log('parsed out buildInfo', buildInfo);
+    if (!buildInfo.hasOwnProperty('id')) {
+        throw new Error('build info missing id');
+    }
+    return buildInfo;
+}
+exports.extractBuildInfo = extractBuildInfo;
 /**
  * Query the EAS BuildInfo from given buildId.
  */
 async function queryEasBuildInfoAsync(easCommand, cwd, buildId) {
     try {
-        // here
         const { stdout } = await (0, exec_1.getExecOutput)(easCommand, ['build:view', buildId, '--json'], {
             cwd,
             silent: true,
         });
-        return JSON.parse(stdout);
+        return extractBuildInfo(stdout);
     }
     catch (error) {
         (0, core_1.info)(`Failed to query eas build ${buildId}: ${String(error)}`);
@@ -38885,7 +38900,6 @@ exports.queryEasBuildInfoAsync = queryEasBuildInfoAsync;
 async function projectInfo(dir) {
     let stdout = '';
     try {
-        //here
         ({ stdout } = await (0, exec_1.getExecOutput)('pnpm expo', ['config', '--json', '--type', 'prebuild'], {
             cwd: dir,
             silent: true,

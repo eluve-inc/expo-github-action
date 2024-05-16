@@ -206,11 +206,35 @@ export async function createEasBuildFromRawCommandAsync(
  */
 export async function cancelEasBuildAsync(easCommand: string, cwd: string, buildId: string): Promise<void> {
   try {
-    // here
     await getExecOutput(easCommand, ['build:cancel', buildId], { cwd });
   } catch (error: unknown) {
     info(`Failed to cancel build ${buildId}: ${String(error)}`);
   }
+}
+
+export function extractBuildInfo(stdout: string): BuildInfo {
+  console.log('parsing out BuildInfo from stdout', stdout);
+
+  const regex = /{(?:[^{}]|{(?:[^{}]|{[^{}]*})*})*?"platform":\s*"[^"]*"(?:[^{}]|{(?:[^{}]|{[^{}]*})*})*?}/s;
+
+  const match = stdout.match(regex);
+
+  if (!match) {
+    console.error('No BuildInfo found in stdout with regex', regex);
+    throw new Error('No BuildInfo found in stdout');
+  }
+
+  console.log(match[0]);
+
+  const buildInfo = JSON.parse(match[0]) as BuildInfo;
+
+  console.log('parsed out buildInfo', buildInfo);
+
+  if (!buildInfo.hasOwnProperty('id')) {
+    throw new Error('build info missing id');
+  }
+
+  return buildInfo;
 }
 
 /**
@@ -222,12 +246,12 @@ export async function queryEasBuildInfoAsync(
   buildId: string
 ): Promise<BuildInfo | null> {
   try {
-    // here
     const { stdout } = await getExecOutput(easCommand, ['build:view', buildId, '--json'], {
       cwd,
       silent: true,
     });
-    return JSON.parse(stdout);
+
+    return extractBuildInfo(stdout);
   } catch (error: unknown) {
     info(`Failed to query eas build ${buildId}: ${String(error)}`);
   }
@@ -241,7 +265,6 @@ export async function projectInfo(dir: string): Promise<ProjectInfo> {
   let stdout = '';
 
   try {
-    //here
     ({ stdout } = await getExecOutput('pnpm expo', ['config', '--json', '--type', 'prebuild'], {
       cwd: dir,
       silent: true,
