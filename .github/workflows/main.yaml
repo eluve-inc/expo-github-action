@@ -14,12 +14,7 @@ jobs:
       actions: 'read'
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          lfs: true
-
+    
       - name: Set variables
         id: variables
         run: |
@@ -30,8 +25,14 @@ jobs:
       - name: output variables
         run: |
             echo "variables are set to:"
-            echo "${{ steps.variables.outputs.update_message }}"
+            echo "update_message : ${{ steps.variables.outputs.update_message }}"
 
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+            fetch-depth: 0
+            lfs: true
+    
     #   - name: Output pull request context
     #     run: |
     #         echo "${{ toJson(github.event.issue.pull_request) }}" > pull_request_context.json

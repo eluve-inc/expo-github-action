@@ -1,0 +1,48 @@
+name: PR Comment
+
+on:
+  issue_comment:
+    types: [created, edited]
+
+jobs:
+  test:
+    if: github.event.issue.pull_request != null && contains(github.event.comment.body, '/expo-update')
+    name: Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      actions: 'read'
+
+    steps:
+      - name: Output pull request context
+        run: |
+            echo "${{ toJson(github.event.issue) }}" > issue.json
+            cat issue.json
+
+      - name: Set variables
+        id: variables
+        run: |
+          message=$(git log -1 --pretty=%s | sed "s/['\"\`]//g")
+          echo "setting update message to $message"
+          echo "update_message=$message" >> $GITHUB_OUTPUT
+          
+          echo "setting branch name to ${{ github.ref_name }}"
+          echo "branch_name=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+
+          echo "setting branch ref to: refs/pull/${{ github.event.issue.number }}/merge"
+          echo "branch=refs/pull/${{ github.event.issue.number }}/merge" >> $GITHUB_OUTPUT
+
+      - name: output variables
+        run: |
+            echo "variables are set to:"
+            echo "update_message : ${{ steps.variables.outputs.update_message }}"
+            echo "branch_name : ${{ steps.variables.outputs.branch_name }}"
+            echo "branch : ${{ steps.variables.outputs.branch }}"
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+            fetch-depth: 0
+            lfs: true
+            ref: ${{ steps.variables.outputs.branch }}
+    
