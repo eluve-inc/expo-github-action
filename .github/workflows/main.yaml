@@ -1,0 +1,34 @@
+name: Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  main:
+    name: Main
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      actions: 'read'
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Set variables
+        id: variables
+        run: |
+          message=$(git log -1 --pretty=%s | sed "s/['\"\`]//g")
+          echo "setting update message to $message"
+          echo "{update_message}={message}" >> $GITHUB_OUTPUT
+
+      - name: output variables
+        run: |
+            echo "variables are set to:"
+            echo $GITHUB_OUTPUT
