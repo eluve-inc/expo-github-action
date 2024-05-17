@@ -14,7 +14,6 @@ jobs:
       actions: 'read'
 
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v3
         with:
@@ -26,9 +25,14 @@ jobs:
         run: |
           message=$(git log -1 --pretty=%s | sed "s/['\"\`]//g")
           echo "setting update message to $message"
-          echo "{update_message}={message}" >> $GITHUB_OUTPUT
+          echo "update_message=$message" >> $GITHUB_OUTPUT
 
       - name: output variables
         run: |
             echo "variables are set to:"
-            echo $GITHUB_OUTPUT
+            echo "${{ steps.variables.outputs.update_message }}"
+
+    #   - name: Output pull request context
+    #     run: |
+    #         echo "${{ toJson(github.event.issue.pull_request) }}" > pull_request_context.json
+    #         cat pull_request_context.json
