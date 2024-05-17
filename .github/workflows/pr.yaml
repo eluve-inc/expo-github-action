@@ -19,6 +19,22 @@ jobs:
       #       echo "${{ toJson(github.event) }}"
       #       cat issue.json
 
+      - name: Get branch name
+        id: get_branch
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const pr = await github.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            return pr.data.head.ref;
+
+      - name: Use branch name
+        run: |
+          echo "branch name: ${{ steps.get_branch.outputs.result }}"
+
       # First checkout the head of the PR branch, so we can get the latest commit. 
       - name: Checkout head of PR branch
         uses: actions/checkout@v3
