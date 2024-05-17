@@ -24,12 +24,16 @@ jobs:
               repo: context.repo.repo,
               pull_number: context.issue.number
             });
-            console.log(pr.data);
-            return pr.data.head.ref;
-
-      - name: Use branch name
-        run: |
-          echo "branch name: ${{ steps.get_branch.outputs.result }}"
+            const branchName = pr.data.head.ref;
+            
+            const commit = await github.repos.getCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: branchName
+            });
+            const commitMessage = commit.data.commit.message;
+      
+            return { branch: branchName, message: commitMessage };
 
       # checkout the merged pr branch 
       - name: Checkout head of PR branch
@@ -40,21 +44,18 @@ jobs:
       - name: Set variables
         id: variables
         run: |
-          # get the 2nd to last commit, not the merge commit
-          message=$(git log -1 --skip 1 --pretty=%s | sed "s/['\"\`]//g")
-          echo "setting update message to $message"
-          echo "update_message=$message" >> $GITHUB_OUTPUT
-          
-          echo "setting branch name to ${{ steps.get_branch.outputs.result }}"
-          echo "branch_name=${{ steps.get_branch.outputs.result }}" >> $GITHUB_OUTPUT
-
+          echo "setting message to ${{ fromJSON(steps.get_branch.outputs.result).message }}"
+          echo "message=${{ fromJSON(steps.get_branch.outputs.result).message }}" >> $GITHUB_OUTPUT
+      
+          echo "setting branch name to ${{ fromJSON(steps.get_branch.outputs.result).branch }}"
+          echo "branch_name=${{ fromJSON(steps.get_branch.outputs.result).branch }}" >> $GITHUB_OUTPUT
+      
           echo "setting pr_url: ${{ github.event.issue.pull_request.html_url }}"
           echo "pr_url=${{ github.event.issue.pull_request.html_url }}" >> $GITHUB_OUTPUT
 
       - name: output variables
         run: |
-            echo "variables are set to:"
-            echo "update_message : ${{ steps.variables.outputs.update_message }}"
+            echo "message : ${{ steps.variables.outputs.message }}"
             echo "branch_name : ${{ steps.variables.outputs.branch_name }}"
             echo "pr_url : ${{ steps.variables.outputs.pr_url }}"
 
