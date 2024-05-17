@@ -26,11 +26,14 @@ jobs:
           echo "setting update message to $message"
           echo "update_message=$message" >> $GITHUB_OUTPUT
           
-          echo "setting branch name to ${{ github.ref_name }}"
-          echo "branch_name=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          echo "setting branch name to ${{ github.event.issue.title }}"
+          echo "branch_name=${{ github.event.issue.title }}" >> $GITHUB_OUTPUT
 
           echo "setting branch ref to: refs/pull/${{ github.event.issue.number }}/merge"
           echo "branch=refs/pull/${{ github.event.issue.number }}/merge" >> $GITHUB_OUTPUT
+
+          echo "setting pr_url: ${{ github.event.issue.pull_request.html_url }}"
+          echo "pr_url=${{ github.event.issue.pull_request.html_url }}" >> $GITHUB_OUTPUT
 
       - name: output variables
         run: |
@@ -38,6 +41,7 @@ jobs:
             echo "update_message : ${{ steps.variables.outputs.update_message }}"
             echo "branch_name : ${{ steps.variables.outputs.branch_name }}"
             echo "branch : ${{ steps.variables.outputs.branch }}"
+            echo "pr_url : ${{ steps.variables.outputs.pr_url }}"
 
       - name: Checkout code
         uses: actions/checkout@v3
