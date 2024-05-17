@@ -16,8 +16,14 @@ jobs:
     steps:
       # - name: Output pull request context
       #   run: |
-      #       echo "${{ toJson(github.event.issue) }}" > issue.json
+      #       echo "${{ toJson(github.event) }}"
       #       cat issue.json
+
+      # First checkout the head of the PR branch, so we can get the latest commit. 
+      - name: Checkout head of PR branch
+        uses: actions/checkout@v3
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}
 
       - name: Set variables
         id: variables
@@ -43,13 +49,12 @@ jobs:
             echo "branch : ${{ steps.variables.outputs.branch }}"
             echo "pr_url : ${{ steps.variables.outputs.pr_url }}"
 
-      - name: Checkout code
+
+       # Then checkout the result of merging this PR with the base branch 
+      - name: Checkout head of PR branch
         uses: actions/checkout@v3
         with:
-            fetch-depth: 0
-            lfs: true
-            ref: ${{ steps.variables.outputs.branch }}
-    
+         ref: refs/pull/${{ github.event.issue.number }}/merge
 
             # "{
             #   "active_lock_reason": null,

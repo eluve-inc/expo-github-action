@@ -13,27 +13,18 @@ jobs:
       contents: 'read'
       actions: 'read'
 
-    steps:
-    
-      - name: Set variables
-        id: variables
-        run: |
-          message=$(git log -1 --pretty=%s | sed "s/['\"\`]//g")
-          echo "setting update message to ${message}"
-          echo "update_message=${message}" >> $GITHUB_OUTPUT
+    steps:      
+        - name: Checkout code
+          uses: actions/checkout@v3
 
-      - name: output variables
-        run: |
+        - name: Set variables
+          id: variables
+          run: |
+            message=$(git log -1 --pretty=%s | sed "s/['\"\`]//g")
+            echo "setting update message to $message"
+            echo "update_message=$message" >> $GITHUB_OUTPUT
+
+        - name: output variables
+          run: |
             echo "variables are set to:"
             echo "update_message : ${{ steps.variables.outputs.update_message }}"
-
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-            fetch-depth: 0
-            lfs: true
-    
-    #   - name: Output pull request context
-    #     run: |
-    #         echo "${{ toJson(github.event.issue.pull_request) }}" > pull_request_context.json
-    #         cat pull_request_context.json
