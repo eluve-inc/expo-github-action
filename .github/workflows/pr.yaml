@@ -14,11 +14,6 @@ jobs:
       actions: 'read'
 
     steps:
-      # - name: Output pull request context
-      #   run: |
-      #       echo "${{ toJson(github.event) }}"
-      #       cat issue.json
-
       - name: Get branch name
         id: get_branch
         uses: actions/github-script@v3
@@ -29,30 +24,29 @@ jobs:
               repo: context.repo.repo,
               pull_number: context.issue.number
             });
+            console.log(pr.data);
             return pr.data.head.ref;
 
       - name: Use branch name
         run: |
           echo "branch name: ${{ steps.get_branch.outputs.result }}"
 
-      # First checkout the head of the PR branch, so we can get the latest commit. 
+      # checkout the merged pr branch 
       - name: Checkout head of PR branch
         uses: actions/checkout@v3
         with:
-          ref: refs/pull/${{ github.event.issue.number }}/head
+          ref: refs/pull/${{ github.event.issue.number }}/merge
 
       - name: Set variables
         id: variables
         run: |
-          message=$(git log -1 --pretty=%s | sed "s/['\"\`]//g")
+          # get the 2nd to last commit, not the merge commit
+          message=$(git log -1 --skip 1 --pretty=%s | sed "s/['\"\`]//g")
           echo "setting update message to $message"
           echo "update_message=$message" >> $GITHUB_OUTPUT
           
-          echo "setting branch name to ${{ github.event.issue.title }}"
-          echo "branch_name=${{ github.event.issue.title }}" >> $GITHUB_OUTPUT
-
-          echo "setting branch ref to: refs/pull/${{ github.event.issue.number }}/merge"
-          echo "branch=refs/pull/${{ github.event.issue.number }}/merge" >> $GITHUB_OUTPUT
+          echo "setting branch name to ${{ steps.get_branch.outputs.result }}"
+          echo "branch_name=${{ steps.get_branch.outputs.result }}" >> $GITHUB_OUTPUT
 
           echo "setting pr_url: ${{ github.event.issue.pull_request.html_url }}"
           echo "pr_url=${{ github.event.issue.pull_request.html_url }}" >> $GITHUB_OUTPUT
@@ -62,15 +56,14 @@ jobs:
             echo "variables are set to:"
             echo "update_message : ${{ steps.variables.outputs.update_message }}"
             echo "branch_name : ${{ steps.variables.outputs.branch_name }}"
-            echo "branch : ${{ steps.variables.outputs.branch }}"
             echo "pr_url : ${{ steps.variables.outputs.pr_url }}"
 
 
-       # Then checkout the result of merging this PR with the base branch 
-      - name: Checkout head of PR branch
-        uses: actions/checkout@v3
-        with:
-         ref: refs/pull/${{ github.event.issue.number }}/merge
+      #  # Then checkout the result of merging this PR with the base branch 
+      # - name: Checkout head of PR branch
+      #   uses: actions/checkout@v3
+      #   with:
+      #    ref: refs/pull/${{ github.event.issue.number }}/merge
 
             # "{
             #   "active_lock_reason": null,
