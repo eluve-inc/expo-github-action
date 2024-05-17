@@ -14,10 +14,10 @@ jobs:
       actions: 'read'
 
     steps:
-      - name: Output pull request context
-        run: |
-            echo "${{ toJson(github.event.issue) }}" > issue.json
-            cat issue.json
+      # - name: Output pull request context
+      #   run: |
+      #       echo "${{ toJson(github.event.issue) }}" > issue.json
+      #       cat issue.json
 
       - name: Set variables
         id: variables
@@ -46,3 +46,72 @@ jobs:
             lfs: true
             ref: ${{ steps.variables.outputs.branch }}
     
+
+            # "{
+            #   "active_lock_reason": null,
+            #   "assignee": null,
+            #   "assignees": [],
+            #   "author_association": "COLLABORATOR",
+            #   "body": "### Linked issue\r\nProvide the issue(s) which this pull request relates to or fixes.\r\n\r\n### Additional context\r\nAre there things the maintainers should be aware of before merging or closing this pull request?\r\n",
+            #   "closed_at": null,
+            #   "comments": 1,
+            #   "comments_url": "https://api.github.com/repos/eluve-inc/expo-github-action/issues/1/comments",
+            #   "created_at": "2024-05-17T03:31:48Z",
+            #   "draft": false,
+            #   "events_url": "https://api.github.com/repos/eluve-inc/expo-github-action/issues/1/events",
+            #   "html_url": "https://github.com/eluve-inc/expo-github-action/pull/1",
+            #   "id": 2301740406,
+            #   "labels": [],
+            #   "labels_url": "https://api.github.com/repos/eluve-inc/expo-github-action/issues/1/labels{/name}",
+            #   "locked": false,
+            #   "milestone": null,
+            #   "node_id": "PR_kwDOL4gc2c5vvQ0z",
+            #   "number": 1,
+            #   "performed_via_github_app": null,
+            #   "pull_request": {
+            #     "diff_url": "https://github.com/eluve-inc/expo-github-action/pull/1.diff",
+            #     "html_url": "https://github.com/eluve-inc/expo-github-action/pull/1",
+            #     "merged_at": null,
+            #     "patch_url": "https://github.com/eluve-inc/expo-github-action/pull/1.patch",
+            #     "url": "https://api.github.com/repos/eluve-inc/expo-github-action/pulls/1"
+            #   },
+            #   "reactions": {
+            #     "+1": 0,
+            #     "-1": 0,
+            #     "confused": 0,
+            #     "eyes": 0,
+            #     "heart": 0,
+            #     "hooray": 0,
+            #     "laugh": 0,
+            #     "rocket": 0,
+            #     "total_count": 0,
+            #     "url": "https://api.github.com/repos/eluve-inc/expo-github-action/issues/1/reactions"
+            #   },
+            #   "repository_url": "https://api.github.com/repos/eluve-inc/expo-github-action",
+            #   "state": "open",
+            #   "state_reason": null,
+            #   "timeline_url": "https://api.github.com/repos/eluve-inc/expo-github-action/issues/1/timeline",
+            #   "title": "Update pr.yaml",
+            #   "updated_at": "2024-05-17T03:31:58Z",
+            #   "url": "https://api.github.com/repos/eluve-inc/expo-github-action/issues/1",
+            #   "user": {
+            #     "avatar_url": "https://avatars.githubusercontent.com/u/2036206?v=4",
+            #     "events_url": "https://api.github.com/users/cpetzel/events{/privacy}",
+            #     "followers_url": "https://api.github.com/users/cpetzel/followers",
+            #     "following_url": "https://api.github.com/users/cpetzel/following{/other_user}",
+            #     "gists_url": "https://api.github.com/users/cpetzel/gists{/gist_id}",
+            #     "gravatar_id": "",
+            #     "html_url": "https://github.com/cpetzel",
+            #     "id": 2036206,
+            #     "login": "cpetzel",
+            #     "node_id": "MDQ6VXNlcjIwMzYyMDY=",
+            #     "organizations_url": "https://api.github.com/users/cpetzel/orgs",
+            #     "received_events_url": "https://api.github.com/users/cpetzel/received_events",
+            #     "repos_url": "https://api.github.com/users/cpetzel/repos",
+            #     "site_admin": false,
+            #     "starred_url": "https://api.github.com/users/cpetzel/starred{/owner}{/repo}",
+            #     "subscriptions_url": "https://api.github.com/users/cpetzel/subscriptions",
+            #     "type": "User",
+            #     "url": "https://api.github.com/users/cpetzel"
+            #   }
+            # }"
