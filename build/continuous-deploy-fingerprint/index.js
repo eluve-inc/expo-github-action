@@ -41921,8 +41921,8 @@ const endMarker = ' >  NX   Successfully ran target';
 const parseEasUpdateOutput = (stdout) => {
     console.log(`***** looking for markers *********`);
     console.log(stdout);
-    // Locate the start of the JSON data by finding the "Published!" marker.
-    const startMarkerIndex = stdout.indexOf(startMarker);
+    // Locate the start of the JSON data by finding start marker.
+    const startMarkerIndex = stdout.lastIndexOf(startMarker);
     if (startMarkerIndex === -1) {
         console.error(`could not find Starting marker (${startMarker}) in stdout.`);
         throw new Error(`Starting marke not found.`);
