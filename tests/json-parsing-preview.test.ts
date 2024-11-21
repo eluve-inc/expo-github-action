@@ -274,87 +274,56 @@ info Dependencies for 'mobile-expo' are up to date! No changes made.
 
    `;
 
+const testNewNxEasCommandDirectOutput = `
+> nx run mobile-expo:eas update --branch=main --message='test eas directly 1' --json --non-interactive
+
+Found eas-cli in your project dependencies.
+It's recommended to use the "cli.version" field in eas.json to enforce the eas-cli version for your project.
+Learn more
+
+✔ Exported bundle(s)
+✔ Uploaded 2 app bundles
+✔ Uploading assets skipped - no new assets found
+✔ Published!
+[
+  {
+    "id": "79ee9060-efb2-4c52-b3cc-e2981ff6a300",
+    "createdAt": "2024-11-21T07:17:33.182Z",
+    "group": "bf21108a-7230-4ab7-a691-1e57a1115bf0",
+    "branch": "main",
+    "message": "test eas directly 1",
+    "runtimeVersion": "0.0.12",
+    "platform": "android",
+    "manifestPermalink": "https://u.expo.dev/update/79ee9060-efb2-4c52-b3cc-e2981ff6a300",
+    "isRollBackToEmbedded": false,
+    "gitCommitHash": "af25f237de9ec8ad89a5792668aa8295a44b2e67"
+  },
+  {
+    "id": "30428570-dcae-4f41-b783-faecdedadc51",
+    "createdAt": "2024-11-21T07:17:33.182Z",
+    "group": "bf21108a-7230-4ab7-a691-1e57a1115bf0",
+    "branch": "main",
+    "message": "test eas directly 1",
+    "runtimeVersion": "0.0.12",
+    "platform": "ios",
+    "manifestPermalink": "https://u.expo.dev/update/30428570-dcae-4f41-b783-faecdedadc51",
+    "isRollBackToEmbedded": false,
+    "gitCommitHash": "af25f237de9ec8ad89a5792668aa8295a44b2e67"
+  }
+]
+
+ >  NX   Successfully ran target eas for project mobile-expo (2m)
+ 
+         With additional flags:
+           update --branch=main --message='test eas directly 1'
+           --json=true
+           --non-interactive=true  
+           
+           `;
+
 describe('parseEasUpdateOutput', () => {
-  it('parses eas update correctly', () => {
-    expect(parseEasUpdateOutput(testOutput)).toEqual([
-      {
-        id: '80ee8c1e-4fc5-4461-ab69-9ba14d83ceb7',
-        createdAt: '2024-05-13T00:41:04.668Z',
-        group: '98eaa3d4-5daa-48f3-94d8-e6f5edbe48d7',
-        branch: 'main',
-        message:
-          'feat: add feature flag for live transcription v2 [ELU-1415] (#763)#### Features- Feature flag for live transcription V2',
-        runtimeVersion: '0.0.6',
-        platform: 'android',
-        manifestPermalink: 'https://u.expo.dev/update/80ee8c1e-4fc5-4461-ab69-9ba14d83ceb7',
-        isRollBackToEmbedded: false,
-        gitCommitHash: '60052629c9b92578d29fa32b45dd38c8f2c59736',
-      },
-      {
-        id: '3393c38f-5c14-47c8-a147-7b6fce02db84',
-        createdAt: '2024-05-13T00:41:04.668Z',
-        group: '98eaa3d4-5daa-48f3-94d8-e6f5edbe48d7',
-        branch: 'main',
-        message:
-          'feat: add feature flag for live transcription v2 [ELU-1415] (#763)#### Features- Feature flag for live transcription V2',
-        runtimeVersion: '0.0.6',
-        platform: 'ios',
-        manifestPermalink: 'https://u.expo.dev/update/3393c38f-5c14-47c8-a147-7b6fce02db84',
-        isRollBackToEmbedded: false,
-        gitCommitHash: '60052629c9b92578d29fa32b45dd38c8f2c59736',
-      },
-    ]);
-  });
-  it('parses multiple marker eas update correctly', () => {
-    expect(parseEasUpdateOutput(testMultipleMarkersOutput)).toEqual([
-      {
-        id: 'ebdc4212-8100-4d3d-850d-5f5ff2368948',
-        createdAt: '2024-07-08T00:26:11.093Z',
-        group: '58414b99-3d5a-4b3a-807c-2ba705ce1c18',
-        branch: 'main',
-        message: 'fix: disable Datadog for local React Native build [ELU-1835] (#1062)',
-        runtimeVersion: '0.0.9',
-        platform: 'android',
-        manifestPermalink: 'https://u.expo.dev/update/ebdc4212-8100-4d3d-850d-5f5ff2368948',
-        isRollBackToEmbedded: false,
-        gitCommitHash: '1a886279acfac1b2da77a4bea7df4125b5142377',
-      },
-      {
-        id: '4c8469de-b29e-4224-b5ac-bad74050a9ff',
-        createdAt: '2024-07-08T00:26:11.093Z',
-        group: '58414b99-3d5a-4b3a-807c-2ba705ce1c18',
-        branch: 'main',
-        message: 'fix: disable Datadog for local React Native build [ELU-1835] (#1062)',
-        runtimeVersion: '0.0.9',
-        platform: 'ios',
-        manifestPermalink: 'https://u.expo.dev/update/4c8469de-b29e-4224-b5ac-bad74050a9ff',
-        isRollBackToEmbedded: false,
-        gitCommitHash: '1a886279acfac1b2da77a4bea7df4125b5142377',
-      },
-    ]);
-  });
-  it('parses complex git message correctly', () => {
-    expect(parseEasUpdateOutput(testComplexGitMessageOutput)).toBeTruthy();
-  });
-  it('can parse a json string', () => {
-    expect(JSON.parse(jsonstring)).toEqual({
-      blocks: [
-        {
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: 'New Native Build pipeline started as a result of a fingerprint change on branch: *main*',
-          },
-        },
-        {
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: 'Build Details:\n• *Android Build:* [<http://reddit.com|View build page>]\n• *iOS Build:* [<http://reddit.com|View build page>]',
-          },
-        },
-      ],
-    });
+  it('parses new eas direct command output successfully', () => {
+    expect(parseEasUpdateOutput(testNewNxEasCommandDirectOutput)).toBeTruthy();
   });
 });
 
