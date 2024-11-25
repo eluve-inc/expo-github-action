@@ -47,7 +47,7 @@ export async function assertEasVersion(versionRange: string) {
   }
 }
 
-const startMarker = `✔ Published!`;
+const startMarker = `--non-interactive`;
 const endMarker = ' >  NX   Successfully ran target';
 
 export const parseEasUpdateOutput = (stdout: string): EasUpdate[] => {

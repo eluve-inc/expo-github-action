@@ -275,51 +275,35 @@ info Dependencies for 'mobile-expo' are up to date! No changes made.
    `;
 
 const testNewNxEasCommandDirectOutput = `
-> nx run mobile-expo:eas update --branch=main --message='test eas directly 1' --json --non-interactive
-
-Found eas-cli in your project dependencies.
-It's recommended to use the "cli.version" field in eas.json to enforce the eas-cli version for your project.
-Learn more
-
-✔ Exported bundle(s)
-✔ Uploaded 2 app bundles
-✔ Uploading assets skipped - no new assets found
-✔ Published!
-[
-  {
-    "id": "79ee9060-efb2-4c52-b3cc-e2981ff6a300",
-    "createdAt": "2024-11-21T07:17:33.182Z",
-    "group": "bf21108a-7230-4ab7-a691-1e57a1115bf0",
-    "branch": "main",
-    "message": "test eas directly 1",
-    "runtimeVersion": "0.0.12",
-    "platform": "android",
-    "manifestPermalink": "https://u.expo.dev/update/79ee9060-efb2-4c52-b3cc-e2981ff6a300",
-    "isRollBackToEmbedded": false,
-    "gitCommitHash": "af25f237de9ec8ad89a5792668aa8295a44b2e67"
-  },
-  {
-    "id": "30428570-dcae-4f41-b783-faecdedadc51",
-    "createdAt": "2024-11-21T07:17:33.182Z",
-    "group": "bf21108a-7230-4ab7-a691-1e57a1115bf0",
-    "branch": "main",
-    "message": "test eas directly 1",
-    "runtimeVersion": "0.0.12",
-    "platform": "ios",
-    "manifestPermalink": "https://u.expo.dev/update/30428570-dcae-4f41-b783-faecdedadc51",
-    "isRollBackToEmbedded": false,
-    "gitCommitHash": "af25f237de9ec8ad89a5792668aa8295a44b2e67"
-  }
-]
-
- >  NX   Successfully ran target eas for project mobile-expo (2m)
- 
-         With additional flags:
-           update --branch=main --message='test eas directly 1'
-           --json=true
-           --non-interactive=true  
-           
-           `;
+ > nx run mobile-expo:eas update --branch=main --message='add quotes and missing command' --json --non-interactive
+  [
+    {
+      "id": "eba9744b-d752-43b9-ae6d-ac97ddf030e6",
+      "createdAt": "2024-11-25T04:55:26.884Z",
+      "group": "36a31624-7f57-4e28-bfe3-f6ba78e91b74",
+      "branch": "main",
+      "message": "add quotes and missing command",
+      "runtimeVersion": "0.0.13",
+      "platform": "android",
+      "manifestPermalink": "https://u.expo.dev/update/eba9744b-d752-43b9-ae6d-ac97ddf030e6",
+      "isRollBackToEmbedded": false,
+      "gitCommitHash": "6fb7f237d4898c8bb6c5c246be1b84d54dc3fd46"
+    },
+    {
+      "id": "97470bab-e9da-49ca-a664-573321700f62",
+      "createdAt": "2024-11-25T04:55:26.884Z",
+      "group": "36a31624-7f57-4e28-bfe3-f6ba78e91b74",
+      "branch": "main",
+      "message": "add quotes and missing command",
+      "runtimeVersion": "0.0.13",
+      "platform": "ios",
+      "manifestPermalink": "https://u.expo.dev/update/97470bab-e9da-49ca-a664-573321700f62",
+      "isRollBackToEmbedded": false,
+      "gitCommitHash": "6fb7f237d4898c8bb6c5c246be1b84d54dc3fd46"
+    }
+  ]
+   
+   >  NX   Successfully ran target eas for project mobile-expo           `;
 
 describe('parseEasUpdateOutput', () => {
   it('parses new eas direct command output successfully', () => {
