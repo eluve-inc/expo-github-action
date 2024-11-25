@@ -42127,7 +42127,7 @@ async function assertEasVersion(versionRange) {
     }
 }
 exports.assertEasVersion = assertEasVersion;
-const startMarker = `Dependencies for 'mobile-expo' are up to date! No changes made.`;
+const startMarker = `✔ Published!`;
 const endMarker = ' >  NX   Successfully ran target';
 const parseEasUpdateOutput = (stdout) => {
     console.log(`***** looking for markers *********`);
@@ -42136,7 +42136,7 @@ const parseEasUpdateOutput = (stdout) => {
     const startMarkerIndex = stdout.lastIndexOf(startMarker);
     if (startMarkerIndex === -1) {
         console.error(`could not find Starting marker (${startMarker}) in stdout.`);
-        throw new Error(`Starting marke not found.`);
+        throw new Error(`Starting marker not found.`);
     }
     // Find the end of the JSON data using the "> NX" marker.
     const endMarkerIndex = stdout.indexOf(endMarker, startMarkerIndex);
