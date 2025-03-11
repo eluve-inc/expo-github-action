@@ -274,40 +274,46 @@ info Dependencies for 'mobile-expo' are up to date! No changes made.
 
    `;
 
-const testNewNxEasCommandDirectOutput = `
- > nx run mobile-expo:eas update --branch=main --message='add quotes and missing command' --json --non-interactive
+const testNx20EasCommandDirectOutput = `
+  > nx run mobile-expo:eas update --branch=main --message='[ELU-2577] Upgrade mobile to expo 52 (#2117)' --json --non-interactive
+  
+  > eas update --branch=main --message='[ELU-2577] Upgrade mobile to expo 52 (#2117)' --json --non-interactive
+  
   [
     {
-      "id": "eba9744b-d752-43b9-ae6d-ac97ddf030e6",
-      "createdAt": "2024-11-25T04:55:26.884Z",
-      "group": "36a31624-7f57-4e28-bfe3-f6ba78e91b74",
+      "id": "8875a8da-f0e3-4319-99d1-3a6faeb59a5d",
+      "createdAt": "2025-03-11T01:31:17.895Z",
+      "group": "154fa790-50e8-4ad6-9006-9fe19229acc6",
       "branch": "main",
-      "message": "add quotes and missing command",
-      "runtimeVersion": "0.0.13",
+      "message": "[ELU-2577] Upgrade mobile to expo 52 (#2117)",
+      "runtimeVersion": "0.0.17",
       "platform": "android",
-      "manifestPermalink": "https://u.expo.dev/update/eba9744b-d752-43b9-ae6d-ac97ddf030e6",
+      "manifestPermalink": "https://u.expo.dev/update/8875a8da-f0e3-4319-99d1-3a6faeb59a5d",
       "isRollBackToEmbedded": false,
-      "gitCommitHash": "6fb7f237d4898c8bb6c5c246be1b84d54dc3fd46"
+      "gitCommitHash": "c5b4b72b694ae0a9591ac6619f58291bfeebe022"
     },
     {
-      "id": "97470bab-e9da-49ca-a664-573321700f62",
-      "createdAt": "2024-11-25T04:55:26.884Z",
-      "group": "36a31624-7f57-4e28-bfe3-f6ba78e91b74",
+      "id": "782df62b-d719-4e70-a3e3-de6ea14b4452",
+      "createdAt": "2025-03-11T01:31:17.895Z",
+      "group": "154fa790-50e8-4ad6-9006-9fe19229acc6",
       "branch": "main",
-      "message": "add quotes and missing command",
-      "runtimeVersion": "0.0.13",
+      "message": "[ELU-2577] Upgrade mobile to expo 52 (#2117)",
+      "runtimeVersion": "0.0.17",
       "platform": "ios",
-      "manifestPermalink": "https://u.expo.dev/update/97470bab-e9da-49ca-a664-573321700f62",
+      "manifestPermalink": "https://u.expo.dev/update/782df62b-d719-4e70-a3e3-de6ea14b4452",
       "isRollBackToEmbedded": false,
-      "gitCommitHash": "6fb7f237d4898c8bb6c5c246be1b84d54dc3fd46"
+      "gitCommitHash": "c5b4b72b694ae0a9591ac6619f58291bfeebe022"
     }
   ]
-   
-   >  NX   Successfully ran target eas for project mobile-expo           `;
+  
+  
+  
+   NX   Successfully ran target eas for project mobile-expo`;
 
 describe('parseEasUpdateOutput', () => {
   it('parses new eas direct command output successfully', () => {
-    expect(parseEasUpdateOutput(testNewNxEasCommandDirectOutput)).toBeTruthy();
+    const result = parseEasUpdateOutput(testNx20EasCommandDirectOutput);
+    expect(result).toHaveLength(2);
   });
 });
 

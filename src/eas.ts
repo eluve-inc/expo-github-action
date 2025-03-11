@@ -48,7 +48,7 @@ export async function assertEasVersion(versionRange: string) {
 }
 
 const startMarker = `--non-interactive`;
-const endMarker = ' >  NX   Successfully ran target';
+const endMarker = 'NX   Successfully ran target';
 
 export const parseEasUpdateOutput = (stdout: string): EasUpdate[] => {
   console.log(`***** looking for markers *********`);
